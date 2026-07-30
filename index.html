@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Бюро 34 — агентство полного цикла</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14151F;
+  --ink-800:#1C1E2C;
+  --ink-700:#262939;
+  --paper:#EFEEE6;
+  --paper-alt:#E4E2D6;
+  --white:#FFFFFF;
+  --red:#E5432A;
+  --red-dark:#C8351E;
+  --yellow:#FFD23F;
+  --line:rgba(20,21,31,.14);
+  --line-strong:rgba(20,21,31,.3);
+  --line-light:rgba(255,255,255,.15);
+  --shadow:0 26px 60px -30px rgba(20,21,31,.5);
+  --display:'Unbounded',sans-serif;
+  --body:'Manrope',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+::selection{background:var(--yellow);color:var(--ink);}
+.wrap{max-width:1220px;margin:0 auto;padding:0 32px;}
+@media(max-width:640px){.wrap{padding:0 20px;}}
+
+.eyebrow{
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--red);display:flex;align-items:center;gap:10px;margin:0 0 16px;
+}
+.eyebrow::before{content:'№';font-weight:700;}
+h1,h2,h3{font-family:var(--display);font-weight:800;margin:0;color:var(--ink);letter-spacing:-.01em;}
+.stamp-underline{text-decoration:none;position:relative;white-space:nowrap;}
+.stamp-underline::after{
+  content:'';position:absolute;left:-2%;right:-2%;bottom:.06em;height:.34em;background:var(--yellow);
+  z-index:-1;transform:skewX(-6deg);
+}
+
+/* ---------- TOP CASE TICKER (progress) ---------- */
+#ticker{
+  position:fixed;top:0;left:0;right:0;height:34px;z-index:1000;background:var(--ink);
+  display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.08);
+  font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.55);letter-spacing:.05em;
+}
+#ticker .dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0;animation:pulse 1.8s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+#ticker-bar{flex:1;height:3px;background:rgba(255,255,255,.12);border-radius:2px;overflow:hidden;max-width:400px;}
+#ticker-fill{height:100%;width:0%;background:var(--red);transition:width .05s linear;}
+#ticker-pct{min-width:34px;text-align:right;color:var(--yellow);}
+@media(max-width:700px){#ticker span.hide-sm{display:none;} #ticker-bar{max-width:100px;}}
+
+/* ---------- HEADER ---------- */
+header{
+  position:fixed;top:34px;left:0;right:0;z-index:900;background:rgba(239,238,230,.88);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0;}
+.logo{font-family:var(--display);font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px;}
+.logo .num{background:var(--ink);color:var(--white);font-size:12px;padding:4px 8px;border-radius:20px;font-family:var(--mono);}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{font-size:14px;font-weight:600;color:var(--ink-700);position:relative;padding:6px 0;}
+.nav-links a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--red);transition:width .25s ease;}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{background:var(--ink);color:#fff;padding:11px 20px;border-radius:3px;font-weight:700;font-size:13.5px;transition:.2s ease;border:none;}
+.nav-cta:hover{background:var(--red);transform:translateY(-2px);}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:none;padding:6px;}
+.burger span{width:24px;height:2px;background:var(--ink);display:block;}
+.mobile-menu{
+  display:none;position:fixed;top:60px;left:0;right:0;bottom:0;background:var(--ink);z-index:850;
+  flex-direction:column;padding:40px 32px;gap:24px;transform:translateY(-8px);opacity:0;pointer-events:none;transition:.28s ease;
+}
+.mobile-menu.open{transform:translateY(0);opacity:1;pointer-events:auto;}
+.mobile-menu a{color:#fff;font-family:var(--display);font-size:24px;font-weight:700;}
+@media(max-width:920px){.nav-links{display:none;}.nav-cta{display:none;}.burger{display:flex;}.mobile-menu{display:flex;}}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;margin-top:60px;padding:96px 0 60px;overflow:hidden;cursor:crosshair;}
+.hero-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:40px;align-items:center;}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr;}}
+.hero h1{font-size:clamp(46px,7.4vw,96px);line-height:.96;text-transform:uppercase;}
+.hero-sub{font-size:17.5px;color:var(--ink-700);max-width:480px;margin:24px 0 34px;}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:16px 28px;border-radius:3px;font-weight:700;font-size:14.5px;border:none;transition:.22s ease;}
+.btn-primary{background:var(--red);color:#fff;}
+.btn-primary:hover{background:var(--red-dark);transform:translateY(-3px);box-shadow:0 16px 30px -14px rgba(229,67,42,.6);}
+.btn-dark{background:var(--ink);color:#fff;}
+.btn-dark:hover{background:var(--ink-700);transform:translateY(-3px);}
+.btn-outline{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink);}
+.btn-outline:hover{border-color:var(--ink);background:var(--white);}
+
+/* rotating stamp */
+.stamp-wrap{position:relative;display:flex;align-items:center;justify-content:center;}
+.stamp{width:min(280px,80vw);animation:spin 22s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.stamp-core{
+  position:absolute;width:34%;height:34%;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--display);font-weight:900;font-size:clamp(28px,4vw,40px);box-shadow:0 0 0 6px var(--paper),0 0 0 8px var(--red);
+}
+
+.stamp-mark{
+  position:fixed;pointer-events:none;z-index:600;width:120px;height:120px;transform:translate(-50%,-50%) scale(.3) rotate(-14deg);
+  opacity:0;transition:transform .45s cubic-bezier(.2,1.6,.4,1), opacity .6s ease;
+}
+.stamp-mark.go{opacity:.9;transform:translate(-50%,-50%) scale(1) rotate(-14deg);}
+.stamp-mark.fade{opacity:0;}
+.stamp-mark svg{width:100%;height:100%;}
+
+.hero-strip{
+  margin-top:56px;display:grid;grid-template-columns:repeat(4,1fr);border-top:1.5px dashed var(--line-strong);
+  border-bottom:1.5px dashed var(--line-strong);
+}
+.strip-item{padding:20px 18px;border-right:1.5px dashed var(--line-strong);}
+.strip-item:last-child{border-right:none;}
+.strip-item b{font-family:var(--display);font-size:clamp(24px,2.8vw,34px);display:block;}
+.strip-item span{font-family:var(--mono);font-size:11px;color:var(--ink-700);text-transform:uppercase;letter-spacing:.05em;}
+@media(max-width:760px){.hero-strip{grid-template-columns:repeat(2,1fr);}.strip-item:nth-child(2){border-right:none;}}
+
+/* ---------- SECTION GENERIC ---------- */
+section{padding:110px 0;position:relative;}
+@media(max-width:760px){section{padding:66px 0;}}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;margin-bottom:54px;}
+.section-head h2{font-size:clamp(30px,4.2vw,50px);text-transform:uppercase;line-height:1;}
+.section-head p{color:var(--ink-700);max-width:340px;font-size:15px;margin:0;}
+@media(max-width:760px){.section-head{flex-direction:column;align-items:flex-start;gap:14px;}}
+.reveal{opacity:0;transform:translateY(34px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);}
+.reveal.in{opacity:1;transform:translateY(0);}
+.stagger>*{transition-delay:calc(var(--i,0)*100ms);}
+
+/* ---------- ABOUT ---------- */
+.about{background:var(--ink);color:#fff;}
+.about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:60px;align-items:center;}
+@media(max-width:900px){.about-grid{grid-template-columns:1fr;gap:36px;}}
+.big-num{font-family:var(--display);font-size:clamp(120px,22vw,260px);font-weight:900;line-height:.8;color:transparent;
+  -webkit-text-stroke:2px rgba(255,255,255,.5);}
+.about .eyebrow{color:var(--yellow);}
+.about h2{color:#fff;font-size:clamp(28px,3.6vw,42px);text-transform:uppercase;margin-bottom:20px;}
+.about p{color:rgba(255,255,255,.72);font-size:16px;max-width:520px;margin-bottom:16px;}
+.about p b{color:#fff;}
+
+/* ---------- SERVICES (case files accordion) ---------- */
+.services{background:var(--paper);}
+.acc{border-top:1.5px solid var(--line-strong);}
+.acc-item{border-bottom:1.5px solid var(--line-strong);}
+.acc-head{
+  display:flex;align-items:center;gap:22px;padding:28px 6px;cursor:pointer;background:none;border:none;width:100%;text-align:left;
+}
+.acc-head .fnum{font-family:var(--mono);color:var(--red);font-size:14px;flex-shrink:0;width:70px;}
+.acc-head h3{font-size:clamp(20px,2.6vw,30px);text-transform:uppercase;flex:1;transition:color .2s ease;}
+.acc-item.open .acc-head h3{color:var(--red);}
+.acc-head .tag{
+  font-family:var(--mono);font-size:11px;color:var(--ink-700);background:var(--paper-alt);padding:6px 12px;border-radius:20px;
+  flex-shrink:0;display:none;
+}
+@media(min-width:700px){.acc-head .tag{display:block;}}
+.acc-chevron{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line-strong);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:transform .35s ease,background .25s ease,border-color .25s ease;}
+.acc-item.open .acc-chevron{transform:rotate(45deg);background:var(--ink);border-color:var(--ink);}
+.acc-item.open .acc-chevron svg{stroke:#fff;}
+.acc-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.2,.7,.2,1);}
+.acc-item.open .acc-panel{grid-template-rows:1fr;}
+.acc-panel-inner{overflow:hidden;min-height:0;}
+.acc-body{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:8px 6px 40px 96px;}
+@media(max-width:820px){.acc-body{grid-template-columns:1fr;padding:8px 6px 34px 6px;}}
+.acc-body p{color:var(--ink-700);font-size:15px;margin:0 0 18px;}
+.acc-body ul{margin:0;padding:0;list-style:none;display:grid;gap:9px;}
+.acc-body li{font-size:14px;color:var(--ink-700);display:flex;gap:10px;align-items:flex-start;}
+.acc-body li::before{content:'—';color:var(--red);flex-shrink:0;}
+.demo-box{
+  background:var(--white);border:1.5px solid var(--line);border-radius:8px;padding:22px;min-height:220px;
+  display:flex;flex-direction:column;
+}
+
+/* demo: AI video */
+.demo-render-btn{align-self:flex-start;margin-bottom:16px;}
+.render-status{font-family:var(--mono);font-size:12px;color:var(--ink-700);margin-bottom:10px;min-height:16px;}
+.render-bar{height:8px;background:var(--paper-alt);border-radius:4px;overflow:hidden;margin-bottom:18px;}
+.render-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--yellow));transition:width .25s linear;}
+.frames-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.frame{aspect-ratio:9/13;border-radius:4px;background:var(--paper-alt);opacity:0;transform:translateY(6px) scale(.9);transition:.4s ease;}
+.frame.show{opacity:1;transform:translateY(0) scale(1);}
+
+/* demo: design */
+.swatch-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.swatch{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:.2s ease;}
+.swatch.active{border-color:var(--ink);transform:scale(1.12);}
+.poster{
+  flex:1;border-radius:8px;display:flex;align-items:flex-end;padding:18px;transition:background 1.2s ease;
+  background:linear-gradient(135deg,#E5432A,#FFD23F);min-height:140px;
+}
+.poster span{font-family:var(--display);color:#fff;font-weight:800;font-size:20px;text-transform:uppercase;text-shadow:0 2px 10px rgba(0,0,0,.25);}
+
+/* demo: sites */
+.device-toggle{display:flex;gap:8px;margin-bottom:18px;}
+.device-pill{padding:8px 16px;border-radius:20px;border:1.5px solid var(--line-strong);background:transparent;font-size:12.5px;font-weight:700;font-family:var(--mono);transition:.2s ease;}
+.device-pill.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.mockup-frame{border:1.5px solid var(--line-strong);border-radius:10px;overflow:hidden;background:var(--paper);margin:0 auto;transition:width .4s ease,max-width .4s ease;width:100%;}
+.mockup-frame.mobile{max-width:180px;}
+.mockup-frame.desktop{max-width:100%;}
+.mockup-bar{height:20px;background:var(--paper-alt);display:flex;align-items:center;gap:4px;padding:0 8px;}
+.mockup-bar i{width:6px;height:6px;border-radius:50%;background:var(--line-strong);display:block;}
+.mockup-body{padding:12px;}
+.mockup-hero{height:34px;background:var(--ink);border-radius:4px;margin-bottom:8px;}
+.mockup-cards{display:grid;gap:6px;grid-template-columns:repeat(3,1fr);}
+.mockup-frame.mobile .mockup-cards{grid-template-columns:1fr;}
+.mockup-cards div{height:36px;background:var(--paper-alt);border-radius:4px;}
+
+/* demo: chat bot */
+.phone{
+  max-width:280px;margin:0 auto;background:var(--ink);border-radius:22px;padding:10px;display:flex;flex-direction:column;flex:1;
+}
+.chat-head{color:#fff;font-family:var(--mono);font-size:11px;padding:6px 10px 10px;display:flex;align-items:center;gap:8px;}
+.chat-head .bot-avatar{width:22px;height:22px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:10px;color:#fff;font-weight:800;}
+.chat-body{background:#fff;border-radius:14px;flex:1;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:170px;max-height:220px;overflow-y:auto;}
+.bubble{max-width:82%;padding:9px 12px;border-radius:12px;font-size:12.5px;line-height:1.4;opacity:0;transform:translateY(6px);animation:bubbleIn .35s ease forwards;}
+@keyframes bubbleIn{to{opacity:1;transform:translateY(0);}}
+.bubble.bot{background:var(--paper-alt);align-self:flex-start;border-bottom-left-radius:3px;}
+.bubble.user{background:var(--red);color:#fff;align-self:flex-end;border-bottom-right-radius:3px;}
+.typing{align-self:flex-start;display:flex;gap:3px;padding:9px 12px;background:var(--paper-alt);border-radius:12px;border-bottom-left-radius:3px;}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--ink-700);animation:tbounce 1s infinite;}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes tbounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-4px);}}
+.quick-replies{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.qr-btn{
+  font-family:var(--mono);font-size:11px;padding:8px 12px;border-radius:20px;border:1.5px solid var(--ink-700);background:transparent;color:#fff;
+  transition:.2s ease;
+}
+.qr-btn:hover{background:var(--red);border-color:var(--red);}
+
+/* ---------- PROCESS ---------- */
+.process{background:var(--paper-alt);}
+.proc-list{display:grid;gap:0;}
+.proc-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:24px;padding:26px 0;border-bottom:1.5px dashed var(--line-strong);align-items:start;}
+.proc-row:first-child{border-top:1.5px dashed var(--line-strong);}
+.proc-row .fnum{font-family:var(--mono);color:var(--red);font-size:15px;}
+.proc-row h3{font-size:18px;text-transform:uppercase;}
+.proc-row p{margin:0;color:var(--ink-700);font-size:14px;}
+@media(max-width:700px){.proc-row{grid-template-columns:50px 1fr;}.proc-row p{grid-column:2;}}
+
+/* ---------- CASES ---------- */
+.cases{background:var(--paper);}
+.case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+@media(max-width:900px){.case-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.case-grid{grid-template-columns:1fr;}}
+.case-card{
+  background:var(--ink);border-radius:8px;padding:26px;color:#fff;position:relative;overflow:hidden;min-height:220px;
+  display:flex;flex-direction:column;justify-content:space-between;transition:transform .3s ease,box-shadow .3s ease;
+}
+.case-card:hover{transform:translateY(-8px);box-shadow:var(--shadow);}
+.case-tag{
+  align-self:flex-start;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+  border:1px solid rgba(255,255,255,.35);padding:5px 11px;border-radius:20px;color:var(--yellow);
+}
+.case-card h3{color:#fff;font-size:22px;text-transform:uppercase;margin-top:24px;}
+.case-card span{font-family:var(--mono);font-size:11.5px;color:rgba(255,255,255,.5);margin-top:8px;display:block;}
+.case-stamp{
+  position:absolute;right:-20px;bottom:-20px;width:120px;height:120px;border:2px solid rgba(255,255,255,.08);border-radius:50%;
+}
+
+/* ---------- TESTIMONIALS ---------- */
+.testi{background:var(--ink);color:#fff;}
+.testi .eyebrow{color:var(--yellow);justify-content:center;}
+.testi-wrap{max-width:740px;margin:0 auto;text-align:center;}
+.testi-slide{display:none;}
+.testi-slide.active{display:block;animation:rise .5s ease;}
+@keyframes rise{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.testi-quote{font-family:var(--display);font-size:clamp(19px,2.6vw,27px);font-weight:600;line-height:1.4;}
+.testi-person{margin-top:24px;font-family:var(--mono);font-size:12.5px;color:rgba(255,255,255,.55);}
+.testi-person b{color:var(--yellow);font-family:var(--body);font-weight:700;display:block;font-size:15px;margin-bottom:3px;}
+.testi-dots{display:flex;gap:10px;justify-content:center;margin-top:34px;}
+.tdot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:.25s ease;}
+.tdot.active{background:var(--yellow);width:24px;border-radius:6px;}
+
+/* ---------- CTA ---------- */
+.cta-banner{background:var(--red);padding:76px 0;position:relative;overflow:hidden;}
+.cta-inner{display:flex;justify-content:space-between;align-items:center;gap:30px;flex-wrap:wrap;position:relative;z-index:2;}
+.cta-inner h2{color:#fff;font-size:clamp(28px,4vw,44px);text-transform:uppercase;max-width:560px;line-height:1.05;}
+
+/* ---------- CONTACT ---------- */
+.contact{background:var(--paper);position:relative;}
+.contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:60px;}
+@media(max-width:900px){.contact-grid{grid-template-columns:1fr;}}
+.contact-info-item{display:flex;gap:16px;padding:18px 0;border-bottom:1.5px dashed var(--line-strong);}
+.contact-info-item b{display:block;font-size:15px;margin-bottom:3px;}
+.contact-info-item span{color:var(--ink-700);font-size:14px;}
+.intake{background:var(--white);border:1.5px solid var(--line);border-radius:10px;padding:36px;position:relative;overflow:hidden;}
+form{display:grid;gap:18px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:560px){.form-row{grid-template-columns:1fr;}}
+.input-group{position:relative;}
+.input-group input,.input-group textarea,.input-group select{
+  width:100%;padding:15px 14px;border:1.5px solid var(--line-strong);border-radius:5px;background:transparent;
+  font-family:var(--body);font-size:14.5px;color:var(--ink);outline:none;transition:border-color .25s ease;resize:none;
+}
+.input-group input:focus,.input-group textarea:focus,.input-group select:focus{border-color:var(--red);}
+.input-group label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-700);display:block;margin-bottom:7px;}
+.submit-btn{justify-self:start;}
+.approved-stamp{
+  position:absolute;inset:0;background:rgba(239,238,230,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s ease;text-align:center;gap:10px;
+}
+.approved-stamp.show{opacity:1;pointer-events:auto;}
+.approved-stamp .ring{
+  width:110px;height:110px;border:4px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  transform:scale(.5) rotate(-18deg);opacity:0;transition:transform .5s cubic-bezier(.2,1.7,.4,1),opacity .4s ease;
+}
+.approved-stamp.show .ring{transform:scale(1) rotate(-10deg);opacity:1;}
+.approved-stamp .ring b{font-family:var(--display);color:var(--red);font-size:13px;text-align:center;line-height:1.3;text-transform:uppercase;}
+.approved-stamp p{font-family:var(--mono);color:var(--ink-700);font-size:13px;max-width:260px;}
+
+/* ---------- FOOTER ---------- */
+footer{background:var(--ink);color:rgba(255,255,255,.6);padding:56px 0 26px;}
+.foot-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:34px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,.1);}
+.foot-logo{font-family:var(--display);font-size:22px;color:#fff;font-weight:800;}
+.foot-cols{display:flex;gap:56px;flex-wrap:wrap;}
+.foot-col b{display:block;color:#fff;font-size:12.5px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;font-family:var(--mono);font-weight:600;}
+.foot-col a{display:block;font-size:14px;margin-bottom:9px;color:rgba(255,255,255,.6);transition:.2s ease;}
+.foot-col a:hover{color:var(--yellow);}
+.foot-bottom{display:flex;justify-content:space-between;padding-top:22px;font-size:12px;flex-wrap:wrap;gap:10px;font-family:var(--mono);}
+
+#totop{
+  position:fixed;bottom:26px;right:26px;width:46px;height:46px;border-radius:50%;background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:500;opacity:0;transform:translateY(10px);
+  pointer-events:none;transition:.3s ease;box-shadow:var(--shadow);
+}
+#totop.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+#totop:hover{background:var(--red);}
+</style>
+</head>
+<body>
+
+<div id="ticker">
+  <div class="dot"></div>
+  <span class="hide-sm">ДЕЛО № 34 В ПРОИЗВОДСТВЕ</span>
+  <div id="ticker-bar"><div id="ticker-fill"></div></div>
+  <span id="ticker-pct">0%</span>
+</div>
+
+<header>
+  <div class="wrap nav">
+    <div class="logo">БЮРО<span class="num">34</span></div>
+    <nav class="nav-links">
+      <a href="#about">О бюро</a>
+      <a href="#services">Услуги</a>
+      <a href="#process">Процесс</a>
+      <a href="#cases">Кейсы</a>
+      <a href="#contact">Контакты</a>
+    </nav>
+    <button class="nav-cta" onclick="location.href='#contact'">Открыть дело</button>
+    <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about">О бюро</a>
+  <a href="#services">Услуги</a>
+  <a href="#process">Процесс</a>
+  <a href="#cases">Кейсы</a>
+  <a href="#contact">Контакты</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="heroSection">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">34 · Открыто с 2021 года</div>
+        <h1>Бюро,<br>которое<br>ведёт дело<br><span class="stamp-underline">до результата</span></h1>
+        <p class="hero-sub">Снимаем рекламные ролики на ИИ, придумываем дизайн, собираем сайты и телеграм-боты. Каждый проект открываем как дело — с брифом, экспертизой и актом сдачи.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="location.href='#contact'">Открыть дело о проекте</button>
+          <button class="btn btn-outline" onclick="location.href='#services'">Посмотреть услуги</button>
+        </div>
+      </div>
+      <div class="stamp-wrap">
+        <svg class="stamp" viewBox="0 0 200 200">
+          <defs>
+            <path id="circlePath" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/>
+          </defs>
+          <circle cx="100" cy="100" r="96" fill="none" stroke="#E5432A" stroke-width="1.5" stroke-dasharray="2 6"/>
+          <circle cx="100" cy="100" r="78" fill="none" stroke="#14151F" stroke-width="1.2"/>
+          <text font-family="IBM Plex Mono" font-size="13" letter-spacing="4" fill="#14151F">
+            <textPath href="#circlePath" startOffset="0%">БЮРО 34 · РЕКЛАМА · ДИЗАЙН · САЙТЫ · БОТЫ ·</textPath>
+          </text>
+        </svg>
+        <div class="stamp-core">34</div>
+      </div>
+    </div>
+
+    <div class="hero-strip">
+      <div class="strip-item"><b class="counter-num" data-count="127">0</b><span>дел закрыто</span></div>
+      <div class="strip-item"><b class="counter-num" data-count="40">0</b><span>ИИ-роликов снято</span></div>
+      <div class="strip-item"><b class="counter-num" data-count="24">0</b><span>ботов в проде</span></div>
+      <div class="strip-item"><b class="counter-num" data-count="98">0</b><span>% сдано в срок</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="about">
+  <div class="wrap about-grid">
+    <div class="reveal"><div class="big-num">34</div></div>
+    <div class="reveal">
+      <div class="eyebrow">О бюро</div>
+      <h2>Мы работаем как настоящее бюро — с делами, а не «проектами в воздухе»</h2>
+      <p>Каждый заказ у нас проходит путь настоящего дела: <b>приём заявления</b> — бриф и первый разговор, <b>экспертиза</b> — разбор задачи и рынка, <b>производство</b> — дизайн, съёмка, код или обучение бота, и <b>акт сдачи</b> — с цифрами и итогами, которые можно предъявить.</p>
+      <p>Внутри бюро — сценаристы и режиссёры ИИ-роликов, дизайнеры, разработчики и инженеры диалоговых систем. Это значит, что ролик, сайт и бот для одного бренда говорят одним голосом — потому что их делает одна команда.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Открытые дела</h2>
+      <p>Четыре направления бюро. Нажмите на дело, чтобы посмотреть, как это работает на практике.</p>
+    </div>
+
+    <div class="acc" id="accordion">
+      <!-- 01 AI VIDEO -->
+      <div class="acc-item open" data-acc="1">
+        <button class="acc-head">
+          <span class="fnum">01</span>
+          <h3>ИИ-ролики для рекламы</h3>
+          <span class="tag">видео</span>
+          <span class="acc-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14151F" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-panel"><div class="acc-panel-inner"><div class="acc-body">
+          <div>
+            <p>Пишем сценарий, собираем референсы и генерируем рекламный ролик с помощью ИИ-моделей — от продуктовой демонстрации до имиджевого видео. Быстрее классической съёмки в разы, при этом с полноценной режиссурой и монтажом.</p>
+            <ul>
+              <li>Сценарий и раскадровка за 2–3 дня</li>
+              <li>Генерация видео, озвучка и субтитры</li>
+              <li>Адаптация под TikTok, Reels, YouTube и ТВ-форматы</li>
+              <li>Неограниченные правки по цветокору и монтажу</li>
+            </ul>
+          </div>
+          <div class="demo-box">
+            <button class="btn btn-dark demo-render-btn" id="renderBtn">Запустить рендер ролика</button>
+            <div class="render-status" id="renderStatus">Готово к запуску</div>
+            <div class="render-bar"><div class="render-fill" id="renderFill"></div></div>
+            <div class="frames-row" id="framesRow"></div>
+          </div>
+        </div></div></div>
+      </div>
+
+      <!-- 02 DESIGN -->
+      <div class="acc-item" data-acc="2">
+        <button class="acc-head">
+          <span class="fnum">02</span>
+          <h3>Дизайн и айдентика</h3>
+          <span class="tag">визуал</span>
+          <span class="acc-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14151F" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-panel"><div class="acc-panel-inner"><div class="acc-body">
+          <div>
+            <p>Разрабатываем логотип, фирменный стиль, упаковку и рекламные макеты — так, чтобы бренд узнавали в ленте с одного взгляда, не читая название.</p>
+            <ul>
+              <li>Логотип, палитра и шрифтовая пара</li>
+              <li>Гайдлайн для команды и подрядчиков</li>
+              <li>Макеты для соцсетей, наружки и упаковки</li>
+              <li>Презентационные материалы и питч-деки</li>
+            </ul>
+          </div>
+          <div class="demo-box">
+            <div class="swatch-row" id="swatchRow"></div>
+            <div class="poster" id="posterDemo"><span>Бюро 34</span></div>
+          </div>
+        </div></div></div>
+      </div>
+
+      <!-- 03 SITES -->
+      <div class="acc-item" data-acc="3">
+        <button class="acc-head">
+          <span class="fnum">03</span>
+          <h3>Разработка сайтов</h3>
+          <span class="tag">web</span>
+          <span class="acc-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14151F" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-panel"><div class="acc-panel-inner"><div class="acc-body">
+          <div>
+            <p>Проектируем и собираем сайты — от посадочной страницы под рекламную кампанию до интернет-магазина с оплатой и личным кабинетом. Всегда адаптивно и быстро.</p>
+            <ul>
+              <li>Прототип и дизайн под ваш бренд</li>
+              <li>Вёрстка, адаптив, анимации</li>
+              <li>Интеграция с CRM и платёжными системами</li>
+              <li>Хостинг, домен и техподдержка после запуска</li>
+            </ul>
+          </div>
+          <div class="demo-box">
+            <div class="device-toggle" id="deviceToggle">
+              <button class="device-pill active" data-mode="desktop">Desktop</button>
+              <button class="device-pill" data-mode="mobile">Mobile</button>
+            </div>
+            <div class="mockup-frame desktop" id="mockupFrame">
+              <div class="mockup-bar"><i></i><i></i><i></i></div>
+              <div class="mockup-body">
+                <div class="mockup-hero"></div>
+                <div class="mockup-cards"><div></div><div></div><div></div></div>
+              </div>
+            </div>
+          </div>
+        </div></div></div>
+      </div>
+
+      <!-- 04 TELEGRAM BOTS -->
+      <div class="acc-item" data-acc="4">
+        <button class="acc-head">
+          <span class="fnum">04</span>
+          <h3>Telegram-боты</h3>
+          <span class="tag">автоматизация</span>
+          <span class="acc-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14151F" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg></span>
+        </button>
+        <div class="acc-panel"><div class="acc-panel-inner"><div class="acc-body">
+          <div>
+            <p>Собираем ботов, которые продают, отвечают на вопросы и записывают клиентов — 24 часа в сутки, без выходных и без «оператор перезвонит вам позже».</p>
+            <ul>
+              <li>Приём заявок, каталог и оплата в чате</li>
+              <li>Запись на услуги и напоминания</li>
+              <li>Интеграция с CRM и рассылками</li>
+              <li>Ответы на частые вопросы без участия человека</li>
+            </ul>
+            <p style="margin-top:14px;font-size:13px;">Попробуйте демо-бота справа — нажмите на кнопку с вопросом.</p>
+          </div>
+          <div class="demo-box" style="padding:14px;">
+            <div class="phone">
+              <div class="chat-head"><span class="bot-avatar">34</span> bureau34_bot online</div>
+              <div class="chat-body" id="chatBody">
+                <div class="bubble bot">Привет! Я бот Бюро 34 👋 Чем помочь?</div>
+              </div>
+              <div class="quick-replies" id="quickReplies"></div>
+            </div>
+          </div>
+        </div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="process">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Как открывается дело</h2>
+      <p>Один и тот же порядок для ролика, сайта, дизайна или бота — прозрачно на каждом шаге.</p>
+    </div>
+    <div class="proc-list stagger">
+      <div class="proc-row reveal" style="--i:0"><span class="fnum">01</span><h3>Приём заявления</h3><p>Бриф, звонок и разбор задачи — фиксируем цель, сроки и бюджет письменно.</p></div>
+      <div class="proc-row reveal" style="--i:1"><span class="fnum">02</span><h3>Экспертиза</h3><p>Изучаем рынок и конкурентов, предлагаем 2–3 сценария решения на выбор.</p></div>
+      <div class="proc-row reveal" style="--i:2"><span class="fnum">03</span><h3>Производство</h3><p>Дизайн, съёмка ИИ-ролика, код или настройка бота — с промежуточными показами.</p></div>
+      <div class="proc-row reveal" style="--i:3"><span class="fnum">04</span><h3>Проверка</h3><p>Тестируем, собираем правки и доводим до финальной версии без сюрпризов.</p></div>
+      <div class="proc-row reveal" style="--i:4"><span class="fnum">05</span><h3>Дело закрыто</h3><p>Передаём результат, доступы и инструкцию — с гарантией на дальнейшую поддержку.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CASES -->
+<section id="cases" class="cases">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <h2>Вещественные доказательства</h2>
+      <p>Несколько дел, которые уже закрыты и приобщены к портфолио.</p>
+    </div>
+    <div class="case-grid stagger">
+      <div class="case-card reveal" style="--i:0"><div class="case-tag">ИИ-ролик</div><h3>Кампания «Свежий старт»</h3><span>Сеть кофеен · 6 роликов · охват 1,2 млн</span><div class="case-stamp"></div></div>
+      <div class="case-card reveal" style="--i:1"><div class="case-tag">Дизайн</div><h3>Ребрендинг «Полёт»</h3><span>Авиашкола · логотип, айдентика, мерч</span><div class="case-stamp"></div></div>
+      <div class="case-card reveal" style="--i:2"><div class="case-tag">Сайт</div><h3>Магазин «Северный дом»</h3><span>Интернет-магазин мебели · +64% заявок</span><div class="case-stamp"></div></div>
+      <div class="case-card reveal" style="--i:3"><div class="case-tag">Бот</div><h3>Ассистент «Клиника 9»</h3><span>Запись на приём · 3 000+ диалогов в месяц</span><div class="case-stamp"></div></div>
+      <div class="case-card reveal" style="--i:4"><div class="case-tag">ИИ-ролик + сайт</div><h3>Запуск «Атлас»</h3><span>Fintech-стартап · лендинг и питч-ролик</span><div class="case-stamp"></div></div>
+      <div class="case-card reveal" style="--i:5"><div class="case-tag">Дизайн + бот</div><h3>«Дом и сад»</h3><span>Розница · каталог-бот и упаковка</span><div class="case-stamp"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testi">
+  <div class="wrap">
+    <div class="testi-wrap">
+      <div class="eyebrow reveal">Показания клиентов</div>
+      <div class="testi-slide active">
+        <p class="testi-quote">Ролик сделали на ИИ за неделю — при том же бюджете, что раньше уходил на один съёмочный день. Результат нельзя было отличить от обычной съёмки.</p>
+        <div class="testi-person"><b>Мария Дегтярёва</b>Основатель сети кофеен «Свежий старт»</div>
+      </div>
+      <div class="testi-slide">
+        <p class="testi-quote">Бот забрал на себя запись на приём — администраторы перестали тонуть в звонках, а пациенты бронируют время в три клика ночью.</p>
+        <div class="testi-person"><b>Илья Реутов</b>Директор «Клиника 9»</div>
+      </div>
+      <div class="testi-slide">
+        <p class="testi-quote">Сайт собрали за три недели вместе с дизайном — и сразу с адаптацией под мобильный, где у нас 70% заказов.</p>
+        <div class="testi-person"><b>Анна Свиридова</b>«Северный дом», интернет-магазин</div>
+      </div>
+      <div class="testi-dots">
+        <div class="tdot active" data-i="0"></div>
+        <div class="tdot" data-i="1"></div>
+        <div class="tdot" data-i="2"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-banner">
+  <div class="wrap cta-inner">
+    <h2>Готовы открыть дело о вашем проекте?</h2>
+    <button class="btn btn-dark" onclick="location.href='#contact'">Оставить заявление</button>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="contact">
+  <div class="wrap contact-grid">
+    <div class="reveal">
+      <div class="eyebrow">Контакты</div>
+      <h2 style="font-size:clamp(26px,3.4vw,38px);text-transform:uppercase;margin-bottom:28px;">Подать заявление в бюро</h2>
+      <div class="contact-info-item"><div><b>+7 (495) 340-03-40</b><span>Ежедневно, 10:00 – 21:00</span></div></div>
+      <div class="contact-info-item"><div><b>hello@buro34.ru</b><span>Отвечаем в течение рабочего дня</span></div></div>
+      <div class="contact-info-item"><div><b>@buro34_bot</b><span>Или напишите прямо в Telegram</span></div></div>
+      <div class="contact-info-item"><div><b>Москва</b><span>Ул. Дизайнеров, 34, офис 401</span></div></div>
+    </div>
+    <div class="intake reveal">
+      <form id="contactForm">
+        <div class="form-row">
+          <div class="input-group"><label>Имя</label><input type="text" id="fname" required></div>
+          <div class="input-group"><label>Телефон или Telegram</label><input type="text" id="fphone" required></div>
+        </div>
+        <div class="input-group">
+          <label>Какое дело открываем?</label>
+          <select id="fservice">
+            <option>ИИ-ролик для рекламы</option>
+            <option>Дизайн и айдентика</option>
+            <option>Сайт</option>
+            <option>Telegram-бот</option>
+            <option>Комплексный проект</option>
+          </select>
+        </div>
+        <div class="input-group"><label>Детали задачи</label><textarea id="fmsg" rows="4"></textarea></div>
+        <button type="submit" class="btn btn-primary submit-btn">Подать заявление</button>
+      </form>
+      <div class="approved-stamp" id="approvedStamp">
+        <div class="ring"><b>Принято<br>в бюро 34</b></div>
+        <p>Дело зарегистрировано. Свяжемся с вами в течение рабочего дня.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo">Бюро 34</div>
+        <p style="max-width:260px;font-size:13px;margin-top:14px;">ИИ-ролики, дизайн, сайты и телеграм-боты. Москва.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col"><b>Разделы</b><a href="#services">Услуги</a><a href="#process">Процесс</a><a href="#cases">Кейсы</a><a href="#contact">Контакты</a></div>
+        <div class="foot-col"><b>Бюро</b><a href="#about">О нас</a><a href="#">Отзывы</a><a href="#">Вакансии</a></div>
+        <div class="foot-col"><b>Связь</b><a href="tel:+74953400340">+7 (495) 340-03-40</a><a href="mailto:hello@buro34.ru">hello@buro34.ru</a></div>
+      </div>
+    </div>
+    <div class="foot-bottom"><span>© 2026 Бюро 34. Дело открыто.</span><span>Демонстрационный сайт</span></div>
+  </div>
+</footer>
+
+<div id="totop">↑</div>
+
+<script>
+// ---------- Ticker / scroll progress ----------
+const tfill = document.getElementById('ticker-fill');
+const tpct = document.getElementById('ticker-pct');
+function updateTicker(){
+  const h = document.documentElement;
+  const max = h.scrollHeight - h.clientHeight;
+  const pct = max > 0 ? Math.min(100, Math.max(0,(h.scrollTop/max)*100)) : 0;
+  tfill.style.width = pct + '%';
+  tpct.textContent = Math.round(pct) + '%';
+  document.getElementById('totop').classList.toggle('show', h.scrollTop > 600);
+}
+document.addEventListener('scroll', updateTicker, {passive:true});
+updateTicker();
+document.getElementById('totop').addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+
+// ---------- Mobile menu ----------
+const burger = document.getElementById('burger');
+const mmenu = document.getElementById('mobileMenu');
+burger.addEventListener('click', ()=> mmenu.classList.toggle('open'));
+mmenu.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=> mmenu.classList.remove('open')));
+
+// ---------- Reveal on scroll ----------
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// ---------- Counters ----------
+const cio = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const el = e.target, target = parseInt(el.dataset.count,10);
+      let cur = 0; const step = Math.max(1, Math.ceil(target/50));
+      const tick = ()=>{ cur += step; if(cur>=target){el.textContent=target;} else {el.textContent=cur; requestAnimationFrame(tick);} };
+      tick(); cio.unobserve(el);
+    }
+  });
+},{threshold:.6});
+document.querySelectorAll('.counter-num').forEach(el=>cio.observe(el));
+
+// ---------- Stamp click effect in hero ----------
+const heroSection = document.getElementById('heroSection');
+heroSection.addEventListener('click', (e)=>{
+  if(e.target.closest('a,button,.hero-actions')) return;
+  const mark = document.createElement('div');
+  mark.className = 'stamp-mark';
+  mark.style.left = e.clientX + 'px';
+  mark.style.top = e.clientY + 'px';
+  mark.innerHTML = '<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="none" stroke="#E5432A" stroke-width="4"/><circle cx="60" cy="60" r="42" fill="none" stroke="#E5432A" stroke-width="1.5" stroke-dasharray="1 5"/><text x="60" y="55" text-anchor="middle" font-family="Unbounded" font-weight="800" font-size="15" fill="#E5432A">34</text><text x="60" y="72" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" fill="#E5432A">ПРИНЯТО</text></svg>';
+  document.body.appendChild(mark);
+  requestAnimationFrame(()=> mark.classList.add('go'));
+  setTimeout(()=> mark.classList.add('fade'), 700);
+  setTimeout(()=> mark.remove(), 1300);
+});
+
+// ---------- Accordion ----------
+document.querySelectorAll('.acc-item').forEach(item=>{
+  item.querySelector('.acc-head').addEventListener('click', ()=>{
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.acc-item').forEach(i=>i.classList.remove('open'));
+    if(!isOpen) item.classList.add('open');
+  });
+});
+
+// ---------- Demo 1: AI render ----------
+const renderBtn = document.getElementById('renderBtn');
+const renderStatus = document.getElementById('renderStatus');
+const renderFill = document.getElementById('renderFill');
+const framesRow = document.getElementById('framesRow');
+for(let i=0;i<5;i++){ const f=document.createElement('div'); f.className='frame'; framesRow.appendChild(f); }
+const stages = ['Анализ сценария…','Подбор референсов…','Генерация кадров…','Цветокоррекция…','Финальная сборка…','Готово ✓'];
+let renderRunning = false;
+renderBtn.addEventListener('click', ()=>{
+  if(renderRunning) return;
+  renderRunning = true;
+  renderBtn.textContent = 'Рендерим…';
+  document.querySelectorAll('.frame').forEach(f=>f.classList.remove('show'));
+  renderFill.style.width = '0%';
+  let pct = 0;
+  const timer = setInterval(()=>{
+    pct += 4 + Math.random()*6;
+    if(pct >= 100){ pct = 100; clearInterval(timer); renderBtn.textContent = 'Запустить ещё раз'; renderRunning = false; }
+    renderFill.style.width = pct + '%';
+    const stageIdx = Math.min(stages.length-1, Math.floor(pct/100*stages.length));
+    renderStatus.textContent = stages[stageIdx];
+    const framesToShow = Math.floor(pct/100*5);
+    document.querySelectorAll('.frame').forEach((f,i)=>{ if(i < framesToShow) f.classList.add('show'); });
+  }, 160);
+});
+
+// ---------- Demo 2: design swatches ----------
+const palettes = [
+  ['#E5432A','#FFD23F'], ['#14151F','#E5432A'], ['#2F5D50','#FFD23F'], ['#3A3F87','#FF7A59'], ['#8A2BE2','#FFD23F']
+];
+const swatchRow = document.getElementById('swatchRow');
+const poster = document.getElementById('posterDemo');
+palettes.forEach((p,i)=>{
+  const s = document.createElement('div');
+  s.className = 'swatch' + (i===0?' active':'');
+  s.style.background = 'linear-gradient(135deg,'+p[0]+','+p[1]+')';
+  s.addEventListener('click', ()=>{
+    document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));
+    s.classList.add('active');
+    poster.style.background = 'linear-gradient(135deg,'+p[0]+','+p[1]+')';
+  });
+  swatchRow.appendChild(s);
+});
+
+// ---------- Demo 3: device toggle ----------
+const deviceToggle = document.getElementById('deviceToggle');
+const mockupFrame = document.getElementById('mockupFrame');
+deviceToggle.addEventListener('click', (e)=>{
+  const b = e.target.closest('.device-pill'); if(!b) return;
+  deviceToggle.querySelectorAll('.device-pill').forEach(p=>p.classList.remove('active'));
+  b.classList.add('active');
+  mockupFrame.className = 'mockup-frame ' + b.dataset.mode;
+});
+
+// ---------- Demo 4: telegram bot ----------
+const chatBody = document.getElementById('chatBody');
+const quickReplies = document.getElementById('quickReplies');
+const flow = {
+  start:[
+    {label:'Узнать цену', next:'price'},
+    {label:'Посмотреть примеры', next:'examples'},
+    {label:'Оставить заявку', next:'lead'}
+  ],
+  price:{
+    text:'Стоимость зависит от задачи: сайт — от 90 000 ₽, ИИ-ролик — от 35 000 ₽, бот — от 60 000 ₽. Хотите точный расчёт?',
+    replies:[{label:'Да, посчитайте', next:'lead'},{label:'Назад', next:'start'}]
+  },
+  examples:{
+    text:'Показать можем в разделе «Вещественные доказательства» чуть выше — там кейсы по всем направлениям бюро 👆',
+    replies:[{label:'Оставить заявку', next:'lead'},{label:'Назад', next:'start'}]
+  },
+  lead:{
+    text:'Отлично! Оставьте телефон в форме внизу сайта — менеджер бюро свяжется с вами в течение дня.',
+    replies:[{label:'Перейти к форме', next:'form'},{label:'Назад', next:'start'}]
+  }
+};
+function addBubble(text, cls){
+  const b = document.createElement('div');
+  b.className = 'bubble ' + cls;
+  b.textContent = text;
+  chatBody.appendChild(b);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+function renderReplies(step){
+  quickReplies.innerHTML = '';
+  const opts = step === 'start' ? flow.start : flow[step].replies;
+  opts.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className = 'qr-btn';
+    btn.textContent = o.label;
+    btn.addEventListener('click', ()=> handleReply(o));
+    quickReplies.appendChild(btn);
+  });
+}
+function handleReply(opt){
+  addBubble(opt.label, 'user');
+  quickReplies.innerHTML = '';
+  if(opt.next === 'form'){
+    document.getElementById('contact').scrollIntoView({behavior:'smooth'});
+    setTimeout(()=> renderReplies('start'), 400);
+    return;
+  }
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  chatBody.appendChild(typing);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  setTimeout(()=>{
+    typing.remove();
+    addBubble(flow[opt.next].text, 'bot');
+    renderReplies(opt.next);
+  }, 700);
+}
+renderReplies('start');
+
+// ---------- Testimonials ----------
+const slides = document.querySelectorAll('.testi-slide');
+const dots = document.querySelectorAll('.tdot');
+let tIndex = 0, tTimer;
+function showSlide(i){
+  slides.forEach(s=>s.classList.remove('active'));
+  dots.forEach(d=>d.classList.remove('active'));
+  slides[i].classList.add('active'); dots[i].classList.add('active'); tIndex = i;
+}
+dots.forEach(d=> d.addEventListener('click', ()=>{ showSlide(parseInt(d.dataset.i,10)); resetTimer(); }));
+function resetTimer(){ clearInterval(tTimer); tTimer = setInterval(()=> showSlide((tIndex+1)%slides.length), 5500); }
+resetTimer();
+
+// ---------- Contact form ----------
+const form = document.getElementById('contactForm');
+const approvedStamp = document.getElementById('approvedStamp');
+form.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('fname').value.trim();
+  const phone = document.getElementById('fphone').value.trim();
+  if(!name || !phone) return;
+  approvedStamp.classList.add('show');
+  setTimeout(()=>{ approvedStamp.classList.remove('show'); form.reset(); }, 3400);
+});
+</script>
+</body>
+</html>
